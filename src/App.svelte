@@ -4,23 +4,30 @@
 	import { onMount, tick } from 'svelte';
 	import MessageGroup from './components/MessageGroup.svelte';
 
-	const scrollMessagesToBottom = () => {
-		if (messagesDiv) {
-			messagesDiv.scrollTo(0, messagesDiv.clientHeight)
-		}
-	}
+	let loggedIn = false
+	let user = ''
+	let newMessage = ''
 
-	$messages = []
+	let messageInput
+	let usernameInput
+	let messagesDiv
+
 	const socket = io()
+
 	socket.on('messages', async (newMessages) => {
 		$messages = [...$messages, ...newMessages].sort((a, b) => a.timestamp - b.timestamp)
 		await tick()
 		scrollMessagesToBottom()
 	})
 
-	setContext('socket', socket)
+	onMount(() => usernameInput.focus())
 
-	let newMessage = ''
+	const scrollMessagesToBottom = () => {
+		if (messagesDiv) {
+			messagesDiv.scrollTo(0, messagesDiv.clientHeight)
+		}
+	}
+
 	const sendMessage = () => {
 		if (!user || !newMessage) {
 			return
@@ -28,14 +35,6 @@
 		socket.emit('message', { content: newMessage, user })
 		newMessage = ''
 	}
-
-	let messageInput
-	let usernameInput
-	let messagesDiv
-
-	let loggedIn = false
-	let user = ''
-
 	const login = async () => {
 		loggedIn = true
 		await tick()
@@ -43,12 +42,10 @@
 		scrollMessagesToBottom()
 	}
 	const logout = async () => {
-		loggedOut = false
+		loggedIn = false
 		await tick()
 		usernameInput.focus()
 	}
-
-	onMount(() => usernameInput.focus())
 </script>
 
 <main>
