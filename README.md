@@ -8,6 +8,7 @@ This app assumes a few things:
 
 -   port 3001 is available
 -   redis is available and running on the default port (6379)
+    -   if you don't have redis installed but you do have docker, you can run `docker run --rm -it -p 6379:6379 redis` to spin up redis quickly
 -   you don't have high expectations
 
 Assuming all of the above requirements are met, you can set this project app with the following commands:
