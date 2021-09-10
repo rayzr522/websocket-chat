@@ -1,6 +1,7 @@
 {
     "type": "module",
-    "name": "svelte-app",
+    "name": "websocket-chat",
+    "description": "A tiny live chat app using Svelte & socket.io",
     "version": "1.0.0",
     "private": true,
     "scripts": {
