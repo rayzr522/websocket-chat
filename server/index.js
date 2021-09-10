@@ -10,12 +10,12 @@ const server = createServer(app)
 const io = new Server(server)
 
 const redisClient = new RedisClient()
-const get = promisify(redisClient.get).bind(redisClient)
-const set = promisify(redisClient.set).bind(redisClient)
+const setMembers = promisify(redisClient.smembers).bind(redisClient)
+const setAdd = promisify(redisClient.sadd).bind(redisClient)
 
 const getHistory = async () => {
-    const currentMessages = (await get('messages')) || '[]'
-    return JSON.parse(currentMessages)
+    const members = await setMembers('messages')
+    return members.map((message) => JSON.parse(message))
 }
 
 const backfill = async (socket) => {
@@ -27,9 +27,7 @@ io.on('connection', async (socket) => {
     socket.on('message', async ({ content, user }) => {
         const message = { content, user, timestamp: Date.now() }
         io.emit('messages', [message])
-
-        const history = await getHistory()
-        await set('messages', JSON.stringify(history.concat(message)))
+        await setAdd('messages', JSON.stringify(message))
     })
 
     await backfill(socket)
